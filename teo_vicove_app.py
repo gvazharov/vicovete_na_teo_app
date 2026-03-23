@@ -3,12 +3,45 @@ import streamlit as st
 
 st.set_page_config(page_title="Вицовете на Тео", layout="wide")
 
+st.markdown("""
+<style>
+/* Target Streamlit selectbox dropdown */
+div[data-baseweb="select"] > div {
+    cursor: pointer !important;
+}
+
+/* Dropdown options */
+ul[role="listbox"] li {
+    cursor: pointer !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+div[data-baseweb="select"] > div:hover {
+    border-color: #999;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("😂 Вицовете на Тео")
 
 # Load data
 @st.cache_data
 def load_data():
     df = pd.read_excel("jokes.xlsx")
+
+    # Clean weird Excel artifacts
+    df["виц_текст"] = (
+    df["виц_текст"]
+    .astype(str)
+    .str.replace("_x000D_", "\n", regex=False)  # convert to real new lines
+    .str.replace("\r", "\n", regex=True)
+    .str.replace("\n+", "\n", regex=True)      # remove duplicate newlines
+    .str.strip()
+)
+
     return df
 
 df = load_data()
